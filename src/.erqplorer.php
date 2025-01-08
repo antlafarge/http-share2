@@ -2,16 +2,16 @@
 
 // Config
 $hideDotStartingDirs = isset($_ENV['HIDE_DOT_STARTING_DIRS'])
-	? preg_match('/^\s*TRUE\s*$/', $_ENV['HIDE_DOT_STARTING_DIRS'])
-	: true;
+? preg_match('/^\s*TRUE\s*$/i', $_ENV['HIDE_DOT_STARTING_DIRS']) == 1
+: true;
 $hideDotStartingFiles = isset($_ENV['HIDE_DOT_STARTING_FILES'])
-	? preg_match('/^\s*TRUE\s*$/', $_ENV['HIDE_DOT_STARTING_FILES'])
+	? preg_match('/^\s*TRUE\s*$/i', $_ENV['HIDE_DOT_STARTING_FILES']) == 1
 	: true;
 $exactFileSize = isset($_ENV['EXACT_FILE_SIZE'])
-	? preg_match('/^\s*TRUE\s*$/', $_ENV['EXACT_FILE_SIZE'])
+	? preg_match('/^\s*TRUE\s*$/i', $_ENV['EXACT_FILE_SIZE']) == 1
 	: false;
 $dateFormat = isset($_ENV['DATE_FORMAT'])
-	? preg_match('/^\s*TRUE\s*$/', $_ENV['DATE_FORMAT'])
+	? $_ENV['DATE_FORMAT']
 	: 'Y/m/d H:i:s';
 
 // globals
@@ -45,23 +45,6 @@ if (is_dir($pageDir)) {
 }
 
 header("Content-type:text/html; charset=utf-8");
-
-// debug('hideDotStartingDirs', $hideDotStartingDirs);
-// debug('hideDotStartingFiles', $hideDotStartingFiles);
-// debug('exactFileSize', $exactFileSize);
-// debug('dateFormat', $dateFormat);
-// debug('protocol', $protocol);
-// debug('host', $host);
-// debug('root', $root);
-// debug('rootDir', $rootDir);
-// debug('rootUrl', $rootUrl);
-// debug('requestUri', $requestUri);
-// debug('relativePath', $relativePath);
-// debug('pageDir', $pageDir);
-// debug('htmlTitle', $htmlTitle);
-// debug('pageTitle', $pageTitle);
-// debug('_SERVER', $_SERVER);
-// debug('_ENV', $_ENV);
 
 function debug($title, $var)
 {
@@ -226,8 +209,8 @@ foreach ($zipExt as &$key) {
 
 function getFiles($path, $showDirs = true, $showFiles = true, $sort = false)
 {
-	global $hideStartingWithDotDirectories;
-	global $hideStartingWithDotFiles;
+	global $hideDotStartingDirs;
+	global $hideDotStartingFiles;
 
 	if (!is_dir($path) || ($dh = opendir($path)) === false) {
 		return false;
@@ -243,11 +226,11 @@ function getFiles($path, $showDirs = true, $showFiles = true, $sort = false)
 		$filepath = "$path/$file";
 
 		if (is_dir($filepath)) {
-			if (!$showDirs || ($hideStartingWithDotDirectories && $file[0] === '.')) {
+			if (!$showDirs || ($hideDotStartingDirs && $file[0] === '.')) {
 				continue;
 			}
 		} else {
-			if (!$showFiles || ($hideStartingWithDotFiles && $file[0] === '.')) {
+			if (!$showFiles || ($hideDotStartingFiles && $file[0] === '.')) {
 				continue;
 			}
 		}
@@ -563,5 +546,26 @@ function displayBreadcrumbs($home, $path)
 		</div>
 
 </body>
+
+<?php
+
+// debug('hideDotStartingDirs', $hideDotStartingDirs);
+// debug('hideDotStartingFiles', $hideDotStartingFiles);
+// debug('exactFileSize', $exactFileSize);
+// debug('dateFormat', $dateFormat);
+// debug('protocol', $protocol);
+// debug('host', $host);
+// debug('root', $root);
+// debug('rootDir', $rootDir);
+// debug('rootUrl', $rootUrl);
+// debug('requestUri', $requestUri);
+// debug('relativePath', $relativePath);
+// debug('pageDir', $pageDir);
+// debug('htmlTitle', $htmlTitle);
+// debug('pageTitle', $pageTitle);
+// debug('_SERVER', $_SERVER);
+// debug('_ENV', $_ENV);
+
+?>
 
 </html>
