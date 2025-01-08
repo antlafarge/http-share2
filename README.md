@@ -1,5 +1,7 @@
 # HTTP-SHARE2
 
+Share a directory through HTTP (protected by htaccess password) by using apache + php.
+
 # Docker compose
 
 ```yml
