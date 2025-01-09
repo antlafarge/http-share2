@@ -2,8 +2,8 @@
 
 // Config
 $hideDotStartingDirs = isset($_ENV['HIDE_DOT_STARTING_DIRS'])
-? preg_match('/^\s*TRUE\s*$/i', $_ENV['HIDE_DOT_STARTING_DIRS']) == 1
-: true;
+	? preg_match('/^\s*TRUE\s*$/i', $_ENV['HIDE_DOT_STARTING_DIRS']) == 1
+	: true;
 $hideDotStartingFiles = isset($_ENV['HIDE_DOT_STARTING_FILES'])
 	? preg_match('/^\s*TRUE\s*$/i', $_ENV['HIDE_DOT_STARTING_FILES']) == 1
 	: true;
@@ -18,14 +18,14 @@ $dateFormat = isset($_ENV['DATE_FORMAT'])
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
 $host = trim(urldecode($_SERVER['HTTP_HOST']), ' ./');
 $scriptName = urldecode($_SERVER['SCRIPT_NAME']);
-$root = trim(mb_substr($scriptName, 0, strrpos($scriptName, '/')), ' ./');
+$root = trim(mb_substr($scriptName, 0, mb_strrpos($scriptName, '/', 0, 'UTF-8'), 'UTF-8'), ' ./');
 $rootDir = $_SERVER['DOCUMENT_ROOT'] . ($root ? '/' . $root : '');
 $rootUrl = "$protocol://$host" . ($root ? '/' . $root : '');
 $requestUri = isset($_SERVER['REQUEST_URI'])
 	? trim(preg_replace('/^\s*([^?]+)?(\?[^#]+)?(#.+)?\s*$/', '$1', urldecode($_SERVER['REQUEST_URI'])), ' ./')
 	: '';
 $relativePath = $root && str_starts_with($requestUri, $root)
-	? trim(mb_substr($requestUri, strlen($root)), ' ./')
+	? trim(mb_substr($requestUri, mb_strlen($root, 'UTF-8')), ' ./')
 	: $requestUri;
 $pageDir = $rootDir . ($relativePath ? '/' . $relativePath : '');
 $htmlTitle = $host . ($root ? '/' . $root : '');
@@ -266,10 +266,10 @@ function listDirectories($path, $uri, $indentCount = 1)
 		$filepath = "$path/$file";
 		$class = 'dir';
 
-		if (strpos($currentPath, $filepath) === 0) {
+		if (mb_strpos($currentPath, $filepath, 0, 'UTF-8') === 0) {
 			$img = '<i class="bi bi-folder2-open"></i>';
 			$listSubDirectories = true;
-			if ($currentPath === $filepath) {
+			if ($currentPath == $filepath) {
 				$class = 'dir-opened';
 			}
 		} else {
@@ -279,7 +279,7 @@ function listDirectories($path, $uri, $indentCount = 1)
 
 		$dirUri = "$uri/$file";
 
-		echo '<tr><td>' . $slashes . '<a href="' . $dirUri . '">' . $img . ' <span class="' . $class . '">' . $file . '</span></a></td></tr>';
+		echo "<tr><td class=\"$class\">$slashes<a href=\"$dirUri\">$img $file</a></td></tr>";
 
 		if ($listSubDirectories) {
 			listDirectories($filepath, $dirUri, $indentCount + 1);
@@ -324,8 +324,8 @@ function listFiles($path)
 		$filepath = "$path/$file";
 
 		$bi = 'file-earmark';
-		if (($extPos = strrpos($file, '.')) !== false) {
-			$ext = strtoupper(mb_substr($file, $extPos + 1));
+		if (($extPos = mb_strrpos($file, '.', 0, 'UTF-8')) !== false) {
+			$ext = mb_strtoupper(mb_substr($file, $extPos + 1, NULL, 'UTF-8'), 'UTF-8');
 			$biTmp = $fileExtToIcon[$ext] ?? null;
 			if ($biTmp != null) {
 				$bi = $biTmp;
@@ -396,7 +396,7 @@ function displayBreadcrumbs($home, $path)
 
 	$uri = $rootUrl;
 
-	displayBreadcrumb(strtoupper($home), $uri, true);
+	displayBreadcrumb($home, $uri, true);
 
 	foreach ($dirs as &$dir) {
 		if ($dir != null) {
@@ -423,20 +423,25 @@ function displayBreadcrumbs($home, $path)
 	<link rel="icon" href=".favicon.ico" />
 	<link rel="icon" type="image/png" sizes="16x16"
 		href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAD1BMVEXf2tGelYtsZF1AOTQMCQhMPdqIAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFzmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDggNzkuMTY0MDM2LCAyMDE5LzA4LzEzLTAxOjA2OjU3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOk1vZGlmeURhdGU9IjIwMjEtMDUtMDNUMDI6MjM6MDErMDI6MDAiIHhtcDpDcmVhdG9yVG9vbD0iMTEuNC4xIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wOC0yMVQwMDo1MzowNSIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMS0wNS0wM1QwMjoyMzowMSswMjowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjIiIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTItMSBibGFjayBzY2FsZWQiIHBob3Rvc2hvcDpEYXRlQ3JlYXRlZD0iMjAxOC0wOC0yMVQwMDo1MzowNS43OTUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MGExZmNjMjctMWEzMS0xMjQ0LTgwNTAtZmZhYzE0ZWNkOTE5IiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjBhMWZjYzI3LTFhMzEtMTI0NC04MDUwLWZmYWMxNGVjZDkxOSIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjBhMWZjYzI3LTFhMzEtMTI0NC04MDUwLWZmYWMxNGVjZDkxOSI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImRlcml2ZWQiIHN0RXZ0OnBhcmFtZXRlcnM9ImNvbnZlcnRlZCBmcm9tIGltYWdlL2pwZWcgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDowYTFmY2MyNy0xYTMxLTEyNDQtODA1MC1mZmFjMTRlY2Q5MTkiIHN0RXZ0OndoZW49IjIwMjEtMDUtMDNUMDI6MjM6MDErMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4wIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPHhtcE1NOkRlcml2ZWRGcm9tIHJkZjpwYXJzZVR5cGU9IlJlc291cmNlIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+AHS69wAAAGVJREFUGBkFwQEBAAAIg7AL9M/stioFsKxV3t2OO7Nlmll32uIsTRJbR7ltkDaHuu1EdBAUCia788jt9JJxp523PGV3YcpJ4DyxOjRwQZxBxTnd2a5R2BRr56xqVXXHrGpVdTSremZpAq0Z0Jp6AAAAAElFTkSuQmCC" />
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
-		integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
-		integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 		crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 	<title><?= $pageTitle ?></title>
 	<style>
 		body {
+			background-color: #111;
 			font-family: consolas;
 		}
 
 		.breadcrumb {
 			margin-top: 1rem;
+		}
+
+		.breadcrumb-item::before {
+			color: #AAA !important;
 		}
 
 		h5 {
@@ -447,20 +452,30 @@ function displayBreadcrumbs($home, $path)
 
 		a {
 			text-decoration: none;
-			color: #0d6efd;
-		}
-
-		a:hover {
-			text-decoration: none;
-			color: #0a58ca;
+			color: #DDD !important;
 		}
 
 		a:visited {
-			color: #4b2f89;
+			color: #AAA !important;
+		}
+
+		a:hover {
+			color: #FFF !important;
+		}
+
+		a:visited:hover {
+			color: #FFF !important;
 		}
 
 		th {
+			background-color: #222 !important;
+			color: #BBB !important;
 			text-align: center;
+		}
+
+		td {
+			background-color: #222 !important;
+			color: #BBB !important;
 		}
 
 		.ftp-table {
@@ -471,7 +486,7 @@ function displayBreadcrumbs($home, $path)
 		.ftp-cell {
 			vertical-align: top;
 			padding: 0;
-			border: 1px solid #0d6efd;
+			border: 1px solid #AAA;
 		}
 
 		.ftp-cell-dirs {
@@ -518,9 +533,9 @@ function displayBreadcrumbs($home, $path)
 							<td class="ftp-cell ftp-cell-dirs">
 								<table class="table table-sm table-borderless table-hover ftp-sub-table">
 									<tr>
-										<td>
+										<td class="dir-opened">
 											<a href="<?= $rootUrl ?>">
-												<i class="bi bi-house"></i> <?= strtoupper($htmlTitle) ?>
+												<i class="bi bi-house"></i> <?= $htmlTitle ?>
 											</a>
 										</td>
 									</tr>
@@ -535,37 +550,14 @@ function displayBreadcrumbs($home, $path)
 				</div>
 			</div>
 
-			<div class="row justify-content-md-center">
+			<div class="row justify-content-md-center footer">
 				<div class="col text-center">
-					<p class="footer">
-						<a href="https://github.com/antlafarge/php-erqplorer" target="_blank">PHP-ErqPlorer v0.6.1</a>
-					</p>
+					<a href="https://github.com/antlafarge/php-erqplorer" target="_blank">PHP-ErqPlorer v0.6.1</a>
 				</div>
 			</div>
 
 		</div>
 
 </body>
-
-<?php
-
-// debug('hideDotStartingDirs', $hideDotStartingDirs);
-// debug('hideDotStartingFiles', $hideDotStartingFiles);
-// debug('exactFileSize', $exactFileSize);
-// debug('dateFormat', $dateFormat);
-// debug('protocol', $protocol);
-// debug('host', $host);
-// debug('root', $root);
-// debug('rootDir', $rootDir);
-// debug('rootUrl', $rootUrl);
-// debug('requestUri', $requestUri);
-// debug('relativePath', $relativePath);
-// debug('pageDir', $pageDir);
-// debug('htmlTitle', $htmlTitle);
-// debug('pageTitle', $pageTitle);
-// debug('_SERVER', $_SERVER);
-// debug('_ENV', $_ENV);
-
-?>
 
 </html>
