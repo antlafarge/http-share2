@@ -453,7 +453,7 @@ function displayBreadcrumbs($home, $path)
 		}
 
 		a:visited {
-			color: #777 !important;
+			color: #999 !important;
 		}
 
 		a:hover {
