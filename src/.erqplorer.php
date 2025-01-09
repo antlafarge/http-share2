@@ -269,7 +269,7 @@ function listDirectories($path, $uri, $indentCount = 1)
 		if (mb_strpos($currentPath, $filepath, 0, 'UTF-8') === 0) {
 			$img = '<i class="bi bi-folder2-open"></i>';
 			$listSubDirectories = true;
-			if ($currentPath == $filepath) {
+			if (str_starts_with($currentPath, $filepath)) {
 				$class = 'dir-opened';
 			}
 		} else {
@@ -434,9 +434,6 @@ function displayBreadcrumbs($home, $path)
 		body {
 			background-color: #111;
 			font-family: consolas;
-		}
-
-		.breadcrumb {
 			margin-top: 1rem;
 		}
 
@@ -456,7 +453,7 @@ function displayBreadcrumbs($home, $path)
 		}
 
 		a:visited {
-			color: #AAA !important;
+			color: #777 !important;
 		}
 
 		a:hover {
@@ -467,6 +464,14 @@ function displayBreadcrumbs($home, $path)
 			color: #FFF !important;
 		}
 
+        .breadcrumb-item a {
+			color: #FFF !important;
+        }
+
+		tr {
+			border: 1px solid #555 !important;
+		}
+
 		th {
 			background-color: #222 !important;
 			color: #BBB !important;
@@ -475,7 +480,6 @@ function displayBreadcrumbs($home, $path)
 
 		td {
 			background-color: #222 !important;
-			border: 1px solid #AAA;
 			color: #BBB !important;
 		}
 
@@ -510,8 +514,13 @@ function displayBreadcrumbs($home, $path)
 			font-weight: bold;
 		}
 
+        .dir-opened a {
+			color: #DDD !important;
+        }
+
 		.footer {
 			margin-top: 1rem;
+			margin-bottom: 1rem;
 		}
 	</style>
 </head>
