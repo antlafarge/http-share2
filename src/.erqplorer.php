@@ -253,7 +253,7 @@ function listDirectories($path, $uri, $indentCount = 1)
 
 	$currentPath = $pageDir;
 
-	$slashes = str_repeat('&nbsp;', 3 * $indentCount);
+	$slashes = str_repeat('&nbsp;', 2 * $indentCount);
 
 	$files = getFiles($path, true, false, true);
 
@@ -475,6 +475,7 @@ function displayBreadcrumbs($home, $path)
 
 		td {
 			background-color: #222 !important;
+			border: 1px solid #AAA;
 			color: #BBB !important;
 		}
 
