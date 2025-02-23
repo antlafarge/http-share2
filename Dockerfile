@@ -1,7 +1,7 @@
 FROM php:8-apache
 
 ENV HTPASSWD_USER="" \
-    HTPASSWD_PASSWORD_="" \
+    HTPASSWD_PASSWORD="" \
     HIDE_DOT_STARTING_DIRS="true" \
     HIDE_DOT_STARTING_FILES="true" \
     EXACT_FILE_SIZE="false" \
