@@ -13,7 +13,7 @@ services:
             - 80:80/tcp
         environment:
             HTPASSWD_USER: "MyUsername"
-            HTPASSWD_PASSWORD_: "MyPassword"
+            HTPASSWD_PASSWORD: "MyPassword"
             HIDE_DOT_STARTING_DIRS: "true"
             HIDE_DOT_STARTING_FILES: "true"
             EXACT_FILE_SIZE: "false"
