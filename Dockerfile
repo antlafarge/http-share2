@@ -9,7 +9,8 @@ ENV HTPASSWD_USER="" \
 
 RUN apt-get update \
  && apt-get install -y apache2-utils \
- && apt-get clean
+ && apt-get clean \
+ && usermod -aG users www-data
 
 COPY src/docker-entrypoint.sh \
         /usr/local/bin/
