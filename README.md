@@ -2,6 +2,8 @@
 
 Share a directory through HTTP (protected by htaccess password) by using apache + php.
 
+Do not replace the entire dir `/var/www/html` by a volume, because it contains the auto-generated `.htaccess` file.
+
 # Docker compose
 
 ```yml
@@ -14,6 +16,8 @@ services:
         environment:
             HTPASSWD_USER: "MyUsername"
             HTPASSWD_PASSWORD: "MyPassword"
+            HIDE_DIRS: "@eaDir|#recycle"
+            HIDE_FILES: ""
             HIDE_DOT_STARTING_DIRS: "true"
             HIDE_DOT_STARTING_FILES: "true"
             EXACT_FILE_SIZE: "false"
